@@ -1504,7 +1504,7 @@ int battle_buttons(int button_types){
 //**************************************************************MAIN FUNCTION**************************************************************
 
 
-int  main(){
+int  main(){//This is the main function 
     printf("\e[8;28;149t");
     printf("\e[?25l");
     fflush(stdout); system("clear");
