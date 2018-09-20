@@ -124,6 +124,7 @@ int total_perfect_powers=0;
 int total_enemies_slain=0;
 int final_bosses_killed=0;
 int perfect_state=0;
+int type_speed_setting = 15000;
 
 char journal[25000][72];
 int journal_status[25000];
@@ -188,7 +189,7 @@ void print_stat_upgrade_health(double x, int button_state);
 void print_reset_button(int button_state);
 void print_done_button(int button_state);
 void print_stat_upgrade(int x,int y, struct Player_Stats* p, bool reset_button_state);
-void print_like_typing(char *s);
+void print_like_typing(char *s, int speed);
 
 //**************************************************************RESET FUNCTIONS**************************************************************
 
@@ -273,7 +274,7 @@ void print_log(void){
       printf("\033[%d;%dH%s", 2+2*i, 40,journal[journal_entry-9+i]); fflush(stdout);
     }}
     printf("\033[%d;%dH", 20, 40); fflush(stdout);
-    print_like_typing(journal[journal_entry]);
+    print_like_typing(journal[journal_entry], type_speed_setting);
     journal_entry++;
 }
 void print_journal(void){
@@ -370,29 +371,20 @@ void submit_log(char input[], int status){
 
 //**************************************************************PRINT FUNCTIONS**************************************************************
 
-void print_like_typing(char* s){ //For printing text like its being typed 
-    int originaltime = 13000;
-    int mintime = 5000;
-    int extratime = 10000;
-    int pivot = 10000;
-    
+void print_like_typing(char* s, int speed){ //For printing text like its being typed
     srand(time(0));
     int i = 0;
     while (s[i] != '\0'){
         printf("%c", s[i]);
         fflush(stdout);
-        int j = rand() % originaltime + 1;
-        if (j > pivot){
-            j+= rand() % extratime;
-        }
-        usleep(mintime + j);
+        usleep(speed);
         i++;
     }
 }
 
 void intro(char* s){
     system("clear");
-    print_like_typing(s);
+    print_like_typing(s, type_speed_setting);
     printf("\n");
     go_on();
 }
