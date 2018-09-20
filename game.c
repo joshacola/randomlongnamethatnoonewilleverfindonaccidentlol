@@ -188,6 +188,7 @@ void print_stat_upgrade_health(double x, int button_state);
 void print_reset_button(int button_state);
 void print_done_button(int button_state);
 void print_stat_upgrade(int x,int y, struct Player_Stats* p, bool reset_button_state);
+void print_like_typing(char *s);
 
 //**************************************************************RESET FUNCTIONS**************************************************************
 
@@ -267,10 +268,12 @@ void print_log(void){
   journal[16][0]='g';
   journal[17][0]='h';*/
     journal_entry--;
-  for(int i=0;i<10;i++){
+  for(int i=0;i<9;i++){
     if(journal_entry-9+i>-1){
       printf("\033[%d;%dH%s", 2+2*i, 40,journal[journal_entry-9+i]); fflush(stdout);
     }}
+    printf("\033[%d;%dH", 20, 40); fflush(stdout);
+    print_like_typing(journal[journal_entry]);
     journal_entry++;
 }
 void print_journal(void){
@@ -1383,7 +1386,6 @@ void battle(struct NPC* p,struct Player_Stats* q){
       battle_buttons(3);
     //printf("It is your turn to attack!\n");
     damage=player_attack(q);
-    battle_screen(0,p,q);
     if(damage==0){/*printf("Since you healed the enemy does not need to defend!\n");*/ goto npc_attack;}
     //printf("It is the NPC's turn to defend!\n");
     npc_defense(damage,p);
@@ -1393,7 +1395,6 @@ void battle(struct NPC* p,struct Player_Stats* q){
     npc_heal(p);
     //printf("It is the NPC's turn to attack!\n");
     damage=npc_attack(p);
-     battle_screen(3,p,q);
     //printf("It is your turn to defend!\n");
     player_defense(damage,q);
   }}
