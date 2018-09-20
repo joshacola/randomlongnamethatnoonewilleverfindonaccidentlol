@@ -1,5 +1,4 @@
 //REILLY JENSEN ARENA GAME 8-15-18
-//Im typing some random comments 
 //**************************************************************INCLUDES**************************************************************
 
 #include <stdio.h>
