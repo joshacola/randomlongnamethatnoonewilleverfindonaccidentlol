@@ -1,4 +1,5 @@
 //REILLY JENSEN ARENA GAME 8-15-18
+//Im typing some random comments 
 //**************************************************************INCLUDES**************************************************************
 
 #include <stdio.h>
@@ -209,7 +210,7 @@ void reset_player_stats(struct Player_Stats* p){//When the game ends the player 
   p->armor=0;
   p->power=0;
   p->perf_block=0;
-    p->perf_power = 0;
+  p->perf_power = 0;
   p->perf_dodge=0;
   p->perf_fire=0;
   p->perf_sword=0;
