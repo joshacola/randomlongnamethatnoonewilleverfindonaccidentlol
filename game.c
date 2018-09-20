@@ -371,10 +371,10 @@ void submit_log(char input[], int status){
 //**************************************************************PRINT FUNCTIONS**************************************************************
 
 void print_like_typing(char* s){ //For printing text like its being typed 
-    int originaltime = 13000;
-    int mintime = 5000;
-    int extratime = 10000;
-    int pivot = 10000;
+    int originaltime = 26000;
+    int mintime = 10000;
+    int extratime = 38000;
+    int pivot = 7000;
     
     srand(time(0));
     int i = 0;
@@ -911,21 +911,30 @@ void skill_upgrade(int i,struct Player_Stats* p)
 float player_block(float damage,struct Player_Stats* p)
 {
   char journal_block[72];
+  snprintf(journal_block,72,"You decided to block!");
+  submit_log(journal_block,1);
+  print_log();
   char input;
   int savedamage;
   if(p->block>PERFECT_UNLOCK_LEVEL && p->perf_block !=0){
-    printf("Do you want to use a perfect block?\n");
+    //printf("Do you want to use a perfect block?\n");
+    snprintf(journal_block,72,"Do you want to use a perfect block?");
+    submit_log(journal_block,0);
+    print_log();
     //printf("You currently have %d perfect blocks\n",p->perf_block);
     //k->player_perfect_block_question=1
     //printf("y=yes anything else is no\n");
-    input=getcha();
-    if(input=='y'){
+    input=battle_buttons(2);
+    if(input==0){
       damage=0;
-      printf("You performed a perfect block and received 0 damage!\n");
+      snprintf(journal_block,72,"You performed a perfect block and received zero damage!");
+      submit_log(journal_block,1);
+      print_log();
+      //printf("You performed a perfect block and received 0 damage!\n");
       p->perf_block--;
       return damage;}
     else{
-      printf("You did not perform a perfect block!\n");
+      //printf("You did not perform a perfect block!\n");
     }
   }
   savedamage=damage;
@@ -934,40 +943,69 @@ float player_block(float damage,struct Player_Stats* p)
   extra_block=( rand () % PLAYER_BLOCK_MOD);
   if(p->block==0){damage=damage*.95-extra_block;
     if(damage<0){damage=0;}
-    printf("your block stopped %f damage\n",savedamage-damage);
+    //printf("your block stopped %f damage\n",savedamage-damage);
+    snprintf(journal_block,72,"Your normal block stopped %f damage",savedamage-damage);
+    submit_log(journal_block,1);
+    print_log();
     return damage;}
   damage=damage*(1-(p->block*PLAYER_BLOCK_COEFF))-extra_block;
   if(damage<0){damage=0;}
-  printf("your block stopped %f damage\n",savedamage-damage);
+  snprintf(journal_block,72,"Your normal block stopped %f damage",savedamage-damage);
+  submit_log(journal_block,1);
+  print_log();
   return damage;
 }
 float player_armor(float damage,struct Player_Stats* p){
+  char journal_armor[72];
   time_t t;
   int threshold=0;
   int random_number=0;
   random_number=( rand () % 100); 
   if(p->armor>PERFECT_UNLOCK_LEVEL && p->perf_armor!=0 && damage!=0){
-    printf("you have a %d percent chance  to take zero damage with perfect armor!\n",PERFECT_ARMOR_MOD);
-    if(random_number<16){printf("You used a perfect armor!\n"); p->perf_armor--; damage=0; return damage;}}
+    snprintf(journal_armor,72,"You have a %d chance to take zero damage with perfect armor!",PERFECT_ARMOR_MOD);
+    submit_log(journal_armor,0);
+    print_log();
+    //printf("you have a %d percent chance  to take zero damage with perfect armor!\n",PERFECT_ARMOR_MOD);
+    if(random_number<16){
+      //printf("You used a perfect armor!\n");
+      snprintf(journal_armor,72,"You used a perfect armor!");
+      submit_log(journal_armor,1);
+      print_log();
+      p->perf_armor--;
+      return 0;
+    }}
   float savedamage=damage;
   damage=damage*(1-(p->armor*PLAYER_ARMOR_COEFF));
-  printf("your armor stopped %f damage\n", savedamage-damage);
+  snprintf(journal_armor,72,"Your armor stopped %f damage!",savedamage-damage);
+  submit_log(journal_armor,1);
+  print_log();
+  //printf("your armor stopped %f damage\n", savedamage-damage);
   return damage;
 }
 int player_dodge(struct Player_Stats* p){
+  char journal_dodge[72];
   char input=0;
   if(p->dodge>PERFECT_UNLOCK_LEVEL && p->perf_dodge!=0){
-    printf("Do you want to use a perfect dodge?\n");
-    printf("You currently have %d perfect dodges\n",p->perf_dodge);
-    printf("y=yes anything else is no\n");
-    input=getcha();
-    if(input=='y'){
-      printf("You performed a perfect dodge!\n");
+    //printf("Do you want to use a perfect dodge?\n");
+    snprintf(journal_dodge,72,"Do you want to use a perfect dodge?");
+    submit_log(journal_dodge,0);
+    print_log();
+    /*printf("You currently have %d perfect dodges\n",p->perf_dodge);
+      printf("y=yes anything else is no\n");*/
+    input=battle_buttons(2);
+    if(input==0){
+      snprintf(journal_dodge,72,"You performed a perfect dodge!");
+      submit_log(journal_dodge,1);
+      print_log();
+      //printf("You performed a perfect dodge!\n");
       p->perf_dodge--;
       return 1;
     }
     else{
-      printf("You did not perform a perfect dodge!\n");
+      snprintf(journal_dodge,72,"You did not perform a perfect dodge!");
+      submit_log(journal_dodge,1);
+      print_log();
+      //printf("You did not perform a perfect dodge!\n");
     }
   }
   time_t t;
@@ -975,24 +1013,39 @@ int player_dodge(struct Player_Stats* p){
   int random_number=0;
   random_number=( rand () % 100);
   threshold=100*(p->dodge*PLAYER_DODGE_COEFF);
-  printf("Your dodge skills give you a %d percent chance of dodging!\n",threshold);
-  if(random_number<threshold){printf("You dodged!\n"); return 1;}
-  printf("You did not dodge!\n");
+  snprintf(journal_dodge,72,"Your dodge skills give you a %d to dodge",threshold);
+  submit_log(journal_dodge,1);
+  print_log();
+  //printf("Your dodge skills give you a %d percent chance of dodging!\n",threshold);
+  if(random_number<threshold){
+    snprintf(journal_dodge,72,"You dodged and avoided all damage!");
+    submit_log(journal_dodge,1);
+    print_log();
+    //printf("You dodged!\n");
+    return 1;}
+  snprintf(journal_dodge,72,"You did not dodge.");
+  submit_log(journal_dodge,1);
+  print_log();
+  //printf("You did not dodge!\n");
   return 0;
 }
-
- float player_heal_after_battle(struct Player_Stats* p){
+float player_heal_after_battle(struct Player_Stats* p){
    float savehealth;
+   char journal_heal[72];
    savehealth=p->health;
    if(p->heal==0){
      p->health=1.05*p->health;
      if(p->health>p->maxhealth){p->health=p->maxhealth;}
-     printf("After the battle you only healed %f because your healing skill is 0!\n",p->health-savehealth);
+     snprintf(journal_heal,72,"After the battle you only healed %f because you have 0 healing skill",p->health-savehealth);
+     submit_log(journal_heal,1);
+     print_log();
      return p->health-savehealth;
    }
    p->health=p->health+p->maxhealth*(PLAYER_HEAL_PER_FIGHT_COEFF*p->heal);
    if(p->health>p->maxhealth){p->health=p->maxhealth;}
-   printf("After the battle you healed %f because of your healing skill!\n",p->health-savehealth);
+   snprintf(journal_heal,72,"After the battle you healed %f becuase of your healing skills!",p->health-savehealth);
+   submit_log(journal_heal,1);
+   print_log();
    return p->health-savehealth;
  }
 
@@ -1054,6 +1107,7 @@ float player_sword(struct Player_Stats* p){
     //printf("Do you want to augment your attack with a perfect sword attack?\n");
     snprintf(journal_sword, 72, "Do you want to use a perfect sword attack?"); 
     submit_log(journal_sword,0);
+    print_log();
     //printf("You currently have %d perfect sword attacks\n",p->perf_sword);
     /*if(p->perf_sword==1){snprintf(journal_sword, 72, "You have %d perfect sword attack available",p->perf_sword);}
     else{snprintf(journal_sword, 72, "You have %d perfect sword attacks available",p->perf_sword);}
@@ -1181,18 +1235,21 @@ float player_power(float damage,struct Player_Stats *p){
 }
 //**************************************************************PLAYER GENERAL DEFENSE FUNCTION**************************************************************
 void player_defense(float damage,struct Player_Stats* p){
+  char journal_defense[72];
   float nextdamage;
   float finaldamage;
   int dodge_success=0;
   /*printf("It is your turn to defend! b=block, d=dodge.\n");*/
-    char input = battle_buttons(1);
+  char input = battle_buttons(1);
  restart_defense :
   switch(input){
- 
       case 1 :
         nextdamage=player_block(damage,p);
         finaldamage=player_armor(nextdamage,p);
         p->health=p->health-finaldamage;
+	snprintf(journal_defense,72,"Your final received damage was %f",finaldamage);
+	submit_log(journal_defense,1);
+	print_log();
         //printf("You took %f final damage after blocking and armoring!\n",finaldamage);
         check_player_health(p);
         //printf("Your health is %f\n",p->health);
@@ -1215,31 +1272,53 @@ void player_defense(float damage,struct Player_Stats* p){
 }
 //**************************************************************NPC DEFENSE FUNCTIONS**************************************************************
 float npc_block(float damage,struct NPC* p){
+  char journal_block[72];
   int extra_block;
   float savedamage;
   savedamage=damage;
   time_t t;  
   extra_block=( rand () % NPC_BLOCK_MOD);
-  printf("| The enemy is going to block!                                               |\n");
+  snprintf(journal_block,72,"The enemy is going to block");
+  submit_log(journal_block,1);
+  print_log();
+  //printf("| The enemy is going to block!                                               |\n");
   if(p->block==0){damage=damage*.95-extra_block;
     if(damage<0){damage=0;}
-    printf("| The enemy block stopped  %f damage                                         |\n",savedamage-damage);
+    snprintf(journal_block,72,"The enemy blocked %f damage.",savedamage-damage);
+    submit_log(journal_block,1);
+    print_log();
+    //printf("| The enemy block stopped  %f damage                                         |\n",savedamage-damage);
     return damage;}
   damage=damage*(1-(p->block*NPC_BLOCK_COEFF))-extra_block;
   if(damage<0){damage=0;}
-  printf("| The enemy block stopped  %f damage                                      |\n",savedamage-damage);
+  snprintf(journal_block,72,"The enemy block stopped %f damage.",savedamage-damage);
+  submit_log(journal_block,1);
+  print_log();
+  //printf("| The enemy block stopped  %f damage                                      |\n",savedamage-damage);
   return damage;
 }
 int npc_dodge(struct NPC* p){
+  char journal_dodge[72];
   if(perfect_state==0){
     time_t t;
     int threshold=0;
     int random_number=0;
     random_number=( rand () % 100);
     threshold=100*(p->dodge*NPC_DODGE_COEFF);
-    printf("Your enemy has a %d percent chance of dodging!\n",threshold);
-    if(random_number<threshold){printf("They dodged!\n"); return 1;}
+    snprintf(journal_dodge,72,"Your enemy has a %d chance of dodging.",threshold);
+    submit_log(journal_dodge,1);
+    print_log();
+    //printf("Your enemy has a %d percent chance of dodging!\n",threshold);
+    if(random_number<threshold){
+      snprintf(journal_dodge,72,"They dodged!");
+      submit_log(journal_dodge,1);
+      print_log();
+      //printf("They dodged!\n");
+      return 1;}
     printf("They did not dodge!\n");
+    snprintf(journal_dodge,72,"They did not dodge.");
+    submit_log(journal_dodge,1);
+    print_log();
     return 0;}
 
   printf("The enemy tried to stupidly dodge your perfect attack!\n");
@@ -1249,16 +1328,21 @@ int npc_dodge(struct NPC* p){
 float npc_armor(float damage,struct NPC* p){
 float savedamage=damage;
   damage=damage*(1-(p->armor*NPC_ARMOR_COEFF));
-  printf("Their armor stopped  %f damage\n", savedamage-damage);
+  char journal_armor[72];
+  //printf("Their armor stopped  %f damage\n", savedamage-damage);
+  snprintf(journal_armor,72,"Their armor stopped %f damage.",savedamage-damage);
+  submit_log(journal_armor,1);
+  print_log();
   return damage;
 }
 
 float npc_heal(struct NPC* p){
+  char journal_heal[72];
   float heal_amount=0;
   int random_number=0;
   random_number=( rand () % NPC_HEAL_MOD);
   if(p->heal==0){
-    heal_amount=p->maxhealth*NPC_HEAL_COEFF;
+      heal_amount=p->maxhealth*NPC_HEAL_COEFF;
       heal_amount+=random_number;
       if (p->health+heal_amount > p->maxhealth) heal_amount = p->maxhealth - p->health;
     p->health=p->health+heal_amount;
@@ -1267,6 +1351,9 @@ float npc_heal(struct NPC* p){
     if (heal_amount+p->health > p->maxhealth) heal_amount = p->maxhealth - p->health;
   p->health=p->health+heal_amount;
   //printf("The NPC healed %f!\n",heal_amount);
+  snprintf(journal_heal,72,"The NPC healed %f.",heal_amount);
+  submit_log(journal_heal,1);
+  print_log();
   return heal_amount;
 }
 
@@ -1335,7 +1422,11 @@ float player_attack(struct Player_Stats* p){
 //**************************************************************NPC GENERAL ATTACK FUNCTION*******************************************************
 
 float npc_attack(struct NPC* p){
-  printf("The NPC is deciding whether to use fire or sword!\n");
+  char journal_attack[72];
+  //printf("The NPC is deciding whether to use fire or sword!\n");
+  snprintf(journal_attack,72,"The enemy is deciding whether to use fire or sword.");
+  submit_log(journal_attack,0);
+  print_log();
   float damage=0;
   int imba=0;
   int random=0;
@@ -1344,12 +1435,20 @@ float npc_attack(struct NPC* p){
   //If imba is positive, fire is preferred
   //If imba is negative, sword is preferred
   if(random+(imba*5)<50){//then sword
-    printf("The enemy decided to use a sword!\n");
+    //printf("The enemy decided to use a sword!\n");
+    snprintf(journal_attack,72,"The enemy is going to use a sword.");
+    submit_log(journal_attack,0);
+    print_log();
     damage=npc_sword(p);}
   else {
-    printf("The enemy decided to use fire!\n");
+    //printf("The enemy decided to use fire!\n");
+    snprintf(journal_attack,72,"The enemy is going to use a fire attack.");
+    submit_log(journal_attack,0);
+    print_log();
     damage=npc_fire(p);}
-  return damage;
+  float final_damage;
+  final_damage=npc_power(damage,p);
+  return final_damage;
 }
 
 
@@ -1357,11 +1456,15 @@ float npc_attack(struct NPC* p){
 
 
 float npc_sword(struct NPC* p){
+  char journal_sword[72];
   int random_modifier=0;
   float output_damage=0;
   random_modifier=( rand () % NPC_SWORD_MOD);
   output_damage=p->sword*NPC_SWORD_COEFF+random_modifier;
-  printf("Enemy output %f damage!",output_damage);
+  //printf("Enemy output %f damage!",output_damage);
+  snprintf(journal_sword,72,"Their sword did %f damage.",output_damage);
+  submit_log(journal_sword,1);
+  print_log();
   npc_power(output_damage,p);
   return output_damage;
 }
