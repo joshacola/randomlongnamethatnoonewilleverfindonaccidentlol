@@ -35,6 +35,7 @@
 #define PERFECT_POWER_MOD 15//chance to activate-1
 #define PERFECT_UNLOCK_LEVEL 5 //The level at which perfect attacks become available -1
 #define PERFECT_POWER_MULTIPLIER 2//how much does it multiply damage by??
+#define PLAYER_MAX_HEALTH_PER_PERFECT_HEAL 10
 //Perfect heal, dodge, and block have no probability elements
 
 //MISC PLAYER
@@ -125,6 +126,7 @@ int final_bosses_killed=0;
 int perfect_state=0;
 
 char journal[25000][72];
+int journal_status[25000];
 int journal_entry=0;
 
 //**************************************************************FUNCTION FOREWARD DECLARATIONS*********************************************************
@@ -233,7 +235,7 @@ void gift_player_stats(struct Player_Stats* p){
   p->perf_sword=1;
   p->perf_heal=1;
   p->perf_armor=1;
-  p->perf_fire=1;
+  p->perf_fire=10;
   p->perf_power=1;
 }
 
@@ -283,6 +285,7 @@ void print_journal(void){
   
   //print log
   for(int i=0;i<25000;i++){
+    if(journal_status[i]==0){continue;}
     printf("Entry %d : %s\n",i,journal[i]);}
 
 }
@@ -346,17 +349,18 @@ char getcha(void) {
     return (buf);
 }
 
-void go_on(void){//Asks user to press any key to continue 
+void go_on(void){//Asks user to press any key to continue
     int temp = 0;
     while(temp == 0) temp = system("read -t 1 -n 10000 discard");
     printf("\033[22;40H                       PRESS ANY KEY TO CONTINUE"); fflush(stdout);
     getcha();
 }
 
-void submit_log(char input[]){
+void submit_log(char input[], int status){
     for (int i = 0; i < 71; i++){
         journal[journal_entry][i] = input[i];
     }
+    journal_status[journal_entry]=status;//1 is print,0 is no print 
     journal[journal_entry][71] = '\0';
     journal_entry++;
 }
@@ -403,14 +407,11 @@ void endscreen (struct Player_Stats* p){//Prints the ending of the game SHOULD M
   exit(0);
 }
 
-void  battle_screen (int state,struct NPC* p, struct Player_Stats* q){//Import new battle screen
+void  battle_screen (int state,struct NPC* p, struct Player_Stats* q){//does all battle screen functions at once
     print_battle_screen_main(p, q);
     print_log();
     battle_buttons(3);
    return;
-
-   
-
  }
  
 //**************************************************************CHECK FUNCTIONS************************************************************
@@ -995,25 +996,34 @@ int player_dodge(struct Player_Stats* p){
 
 float player_fire(struct Player_Stats* p){
   char input;
-    char journal_fire[72];
+  char journal_fire[72];
   int perfect_modifier=0;
+  snprintf(journal_fire,72,"You decide to use a fire attack!");
+  submit_log(journal_fire,1);
+  print_log();
    if(p->fire>PERFECT_UNLOCK_LEVEL && p->perf_fire !=0){
     snprintf(journal_fire, 72, "Do you want to augment your attack with a perfect fire?");
-       submit_log(journal_fire);
-       print_log();
-    //printf("| You currently have %d perfect fires   |\n",p->perf_fire);
-    //printf("| y=yes anything else is no          |\n");
-    //printf("| ");
+    submit_log(journal_fire,0);
+    if(p->perf_fire==1){snprintf(journal_fire, 72, "You currently have the abillity to cast %d perfect fire",p->perf_fire);}
+    else{snprintf(journal_fire, 72, "You currently have the abillity to cast %d perfect fires",p->perf_fire);}
+    submit_log(journal_fire,0);
+    print_log();
        input = battle_buttons(2); //2 means yes or no
        //returns 0: yes, 1: no
     if(input==0){
       perfect_state=1;
       //printf("| Your perfect fire attack has a crazy modifier!  |\n");
+      snprintf(journal_fire,72,"Your perfect fire attack has a larger random contribution!");
+      submit_log(journal_fire,1);
+      print_log();
       p->perf_fire--;
       perfect_modifier=PERFECT_FIRE_MOD;
       }
     else{
       //printf("You did not perform a perfect fire!\n");
+      snprintf(journal_fire,72,"You did not use a perfect fire attack!");
+      submit_log(journal_fire,1);
+      print_log();
     }
   }
   int random_modifier=0;
@@ -1023,26 +1033,44 @@ float player_fire(struct Player_Stats* p){
   output_damage=p->fire*PLAYER_FIRE_COEFF+random_modifier;
     snprintf(journal_fire, 72, "Fire power is  %-8.2f",output_damage);
     //new char array[72], 72, string, parameters
-  submit_log(journal_fire);
+    submit_log(journal_fire,1);
+    print_log();
   return output_damage;
 }
 float player_sword(struct Player_Stats* p){
+  char journal_sword[72];
   char input;
   int perfect_modifier=0;
   float final_damage=0;
+  snprintf(journal_sword,72,"You decided to use a sword attack!");
+  submit_log(journal_sword,1);
+  print_log();
    if(p->sword>PERFECT_UNLOCK_LEVEL && p->perf_sword !=0){
     //printf("Do you want to augment your attack with a perfect sword attack?\n");
+    snprintf(journal_sword, 72, "Do you want to use a perfect sword attack?"); 
+    submit_log(journal_sword,0);
     //printf("You currently have %d perfect sword attacks\n",p->perf_sword);
-    //printf("y=yes anything else is no\n");
-    input = getcha();
-    if(input=='y'){
+    if(p->perf_sword==1){snprintf(journal_sword, 72, "You have %d perfect sword attack available",p->perf_sword);}
+    else{snprintf(journal_sword, 72, "You have %d perfect sword attacks available",p->perf_sword);}
+    submit_log(journal_sword,0);
+    print_log();
+      
+    input = battle_buttons(2); //2 means yes or no
+       //returns 0: yes, 1: no
+    if(input==0){
       perfect_state=1;
       //printf("You are performing a perfect sword attack which will have a crazy high extra base damage!\n");
+      snprintf(journal_sword, 72, "Your perfect sword attack will have higher damage!");
+      submit_log(journal_sword,1);
+      print_log();
       p->perf_sword--;
       perfect_modifier=1;
       }
     else{
       //printf("You did not perform a perfect sword attack!\n");
+      snprintf(journal_sword, 72, "You did not perform a perfect sword attack!");
+      submit_log(journal_sword,1);
+      print_log();
     }
   }
   int random_modifier=0;
@@ -1051,18 +1079,30 @@ float player_sword(struct Player_Stats* p){
   random_modifier=( rand () % PLAYER_SWORD_MOD);
   output_damage=p->sword*PLAYER_SWORD_COEFF;
   if(perfect_modifier==1){output_damage=output_damage+PERFECT_SWORD_MOD;}
-  printf("Sword strength is %f damage",output_damage+random_modifier);
+  //printf("Sword strength is %f damage",output_damage+random_modifier);
+  snprintf(journal_sword,72,"Your sword is doing %f damage!",output_damage+random_modifier);
+  submit_log(journal_sword,1);
+  print_log();
   output_damage=output_damage+random_modifier;
   final_damage=player_power(output_damage,p);
   return output_damage+random_modifier;
 }
 void player_heal(struct Player_Stats* p){
+  char journal_heal[72];
+  snprintf(journal_heal,72,"You decided to heal instead of attacking.");
+  submit_log(journal_heal,1);
+  print_log();
   float healthprior=p->health;
   if(p->heal==0){
     p->health=p->health+.1*p->maxhealth;
     if(p->health>p->maxhealth){p->health=p->maxhealth;}
-    printf("You perform a normal heal with no skill bonuses.\n");
-    printf("You healed %f points!\n",p->health-healthprior);
+    snprintf(journal_heal,72,"You will perform a normal heal with no skill bonuses.");
+    submit_log(journal_heal,0);
+    //printf("You perform a normal heal with no skill bonuses.\n");
+    //printf("You healed %f points!\n",p->health-healthprior);
+    snprintf(journal_heal,72,"You healed %f points.",p->health-healthprior);
+    submit_log(journal_heal,0);
+    print_log();
     return;}
   time_t t;
   int random_modifier=0;
@@ -1070,28 +1110,50 @@ void player_heal(struct Player_Stats* p){
   random_modifier=( rand () % (maxrand));
   char input;
    if(p->heal>PERFECT_UNLOCK_LEVEL && p->perf_heal !=0){
-    printf("Do you want to augment your heal with a perfect heal? You will also boost your max health by 10 if you do this.\n");
-    printf("You currently have %d perfect heals\n",p->perf_heal);
-    printf("y=heal completely else is no!\n");
-    input = getcha();
-    if(input=='y'){
-      printf("You have performed a perfect heal! \nAs a benefit your max health has also been increased by 10 points.\n");
+    //printf("Do you want to augment your heal with a perfect heal? You will also boost your max health by 10 if you do this.\n");
+    snprintf(journal_heal,72,"Will you do a perfect heal? This will also boost your max HP by %d.",PLAYER_MAX_HEALTH_PER_PERFECT_HEAL);
+    submit_log(journal_heal,0);
+    print_log();
+    //printf("You currently have %d perfect heals\n",p->perf_heal);
+    if(p->perf_heal==1){snprintf(journal_heal,72,"You currently have %d perfect heal available.",p->perf_heal);}
+    else{snprintf(journal_heal,72,"You currently have %d perfect heals available.",p->perf_heal);}
+    submit_log(journal_heal,0);
+    print_log();
+    //printf("y=heal completely else is no!\n");
+    input = battle_buttons(2);
+    if(input==0){
+      //printf("You have performed a perfect heal! \nAs a benefit your max health has also been increased by 10 points.\n");
+      snprintf(journal_heal,72,"You performed a perfect heal! This heals 100%% and will boost your max health by %d.",PLAYER_MAX_HEALTH_PER_PERFECT_HEAL);
+      submit_log(journal_heal,1);
+      print_log();
       p->perf_heal--;
-      p->maxhealth=p->maxhealth+10;
+      p->maxhealth=p->maxhealth+PLAYER_MAX_HEALTH_PER_PERFECT_HEAL;
       p->health=p->maxhealth;
-      printf("You healed %f points!\n",p->health-healthprior);
-      printf("Your health is now %f!\n",p->health);
+      snprintf(journal_heal,72,"You healed a %f amount of points!",p->health-healthprior);
+      submit_log(journal_heal,1);
+      print_log();
+      //printf("You healed %f points!\n",p->health-healthprior);
+      //printf("Your health is now %f!\n",p->health);
       return;
       }
     else{
       printf("You did not perform a perfect heal!\n");
+      snprintf(journal_heal,72,"You did not perform a perfect heal!");
+      submit_log(journal_heal,1);
+      print_log();
     }
    }
    printf("You perform a normal heal!\n");
+   snprintf(journal_heal,72,"You perform a normal heal!");
+   submit_log(journal_heal,1);
+   print_log();
    p->health=p->health+(.35*(p->maxhealth*(p->heal*.08))+random_modifier)+p->maxhealth*.1;
    if(p->health>p->maxhealth){p->health=p->maxhealth;}
-   printf("You healed %f points!\n",p->health-healthprior);
-   printf("Your health is now %f!\n",p->health);
+   snprintf(journal_heal,72,"You healed %f points!",p->health-healthprior);
+   submit_log(journal_heal,1);
+   print_log();
+   //printf("You healed %f points!\n",p->health-healthprior);
+   //printf("Your health is now %f!\n",p->health);
    return;
 }
 
@@ -1108,10 +1170,7 @@ float player_power(float damage,struct Player_Stats *p){
   return damage;
 
 }
-
 //**************************************************************PLAYER GENERAL DEFENSE FUNCTION**************************************************************
-
-
 void player_defense(float damage,struct Player_Stats* p){
   float nextdamage;
   float finaldamage;
@@ -1145,9 +1204,7 @@ void player_defense(float damage,struct Player_Stats* p){
   }
   return;
 }
-
 //**************************************************************NPC DEFENSE FUNCTIONS**************************************************************
-
 float npc_block(float damage,struct NPC* p){
   int extra_block;
   float savedamage;
