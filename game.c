@@ -238,8 +238,14 @@ void gift_player_stats(struct Player_Stats* p){
 }
 
 //*********************************************************UTILITY FUNCTIONS******************************************************************
+void clear_log(){
+    for(int i=0;i<21;i++){
+        printf("\033[%d;%dH%s", 2+i, 39, "                                                                         "); fflush(stdout);
+    }
+}
 
 void print_log(void){
+    clear_log();
   /*journal[0][0]='1';
   journal[1][0]='2';
   journal[2][0]='3';
@@ -264,7 +270,6 @@ void print_log(void){
       printf("\033[%d;%dH%s", 2+2*i, 40,journal[journal_entry-9+i]); fflush(stdout);
     }}
     journal_entry++;
-    //printf("\n\n\n\n\n\n\n\n");
 }
 void print_journal(void){
   /*
@@ -344,7 +349,7 @@ char getcha(void) {
 void go_on(void){//Asks user to press any key to continue 
     int temp = 0;
     while(temp == 0) temp = system("read -t 1 -n 10000 discard");
-    printf("\033[22;40HPress any key to continue.\n\n\n\n\n\n"); fflush(stdout);
+    printf("\033[22;40H                       PRESS ANY KEY TO CONTINUE"); fflush(stdout);
     getcha();
 }
 
@@ -402,20 +407,6 @@ void  battle_screen (int state,struct NPC* p, struct Player_Stats* q){//Import n
     print_battle_screen_main(p, q);
     print_log();
     battle_buttons(3);
-/*   printf("|----------------------------------------------------------------------------|\n");
-   if(state==0){
-     printf("| It is your turn to attack!                                                 |\n");
-     printf("| s for sword, f for fire, h for heal.                                       |\n");}
-   if(state==1){
-     printf("| The enemy is defending!                                                    |\n");
-     printf("|                                                                            |\n");}
-   if(state==2){
-     printf("| The enemy is attacking!                                                    |\n");
-     printf("|                                                                            |\n");}
-   if(state==3){
-     printf("| You are defending!                                                         |\n");
-     printf("| d for dodge, b for block.                                                  |\n");}
-   printf("|____________________________________________________________________________|\n");*/
    return;
 
    
