@@ -1,17 +1,5 @@
--states for battles screen
--completely redo battle screen
--add struct battle_screen_info to functions
--make skill upgrade ui thing (same size as battle screen!!)
--comment out all printf in battle (add to battle screen)
--float printing format
--printf constant spacing
 -fix insult generator (add to program)
       -make death/victory generator
-
-
--print like typing inside of ui thing?
-
- ___________________________________________________________________________________________________
-|                        |                        |                        |                        |
-|        SWORD (s)       |        FIRE (f)        |        HEAL (h)        |      VIEW LOG (l)      |
-|________________________|________________________|________________________|________________________|
+-start working on content (struct for each npc, custom taunts, etc.)
+-add more detail about skills in the skill upgrade screen
+-
