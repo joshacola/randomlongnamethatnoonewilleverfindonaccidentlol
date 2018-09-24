@@ -706,7 +706,7 @@ void skill_upgrade(int i,struct Player_Stats* p)
 
               }
               if (i == 0){
-                  button_state = 8;
+                  button_state = 9;
               }
           }
           else {
@@ -885,7 +885,7 @@ void skill_upgrade(int i,struct Player_Stats* p)
 
                   }
                   if (i == 0){
-                      button_state = 8;
+                      button_state = 9;
                   }
                   break;
               default:

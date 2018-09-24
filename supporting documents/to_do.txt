@@ -2,4 +2,7 @@
       -make death/victory generator
 -start working on content (struct for each npc, custom taunts, etc.)
 -add more detail about skills in the skill upgrade screen
--
+-add journal functionality
+-make all "you" and "your" into player name
+-make all "the enemy" into npc name
+-figure out why there is such a giant pause between turns
