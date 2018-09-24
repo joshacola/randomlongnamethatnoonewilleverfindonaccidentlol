@@ -1317,7 +1317,7 @@ float npc_sword(struct NPC* p){
   output_damage=p->sword*NPC_SWORD_COEFF+random_modifier;
   snprintf(journal_sword,72,"Their sword did %f damage.",output_damage);
   submit_log(journal_sword,1,1);
-  npc_power(output_damage,p);
+  //npc_power(output_damage,p);
   return output_damage;
 }
 float npc_fire(struct NPC* p){
@@ -1329,7 +1329,7 @@ float npc_fire(struct NPC* p){
   output_damage=p->fire*NPC_FIRE_COEFF+random_modifier;
   snprintf(journal_fire,72,"The enemy output %f fire damage.",output_damage);
   submit_log(journal_fire,1,1);
-  npc_power(output_damage,p);
+  //npc_power(output_damage,p);
   return output_damage;
 }
 
@@ -1548,10 +1548,8 @@ int  main(){
     noob.power = 2;
     noob.maxhealth=1000;
     noob.heal = 0;
-    //battle_screen(0, &noob, &q);
+    battle_screen(0, &noob, &q);
     skill_upgrade(15, &q);
-
-    
-    //battle(&noob,&q);
+    battle(&noob,&q);
 return 0;
 }
