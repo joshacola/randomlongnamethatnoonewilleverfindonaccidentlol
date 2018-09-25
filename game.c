@@ -96,6 +96,8 @@ struct NPC {
   float health;
   float maxhealth;
   char name[MAX_NPC_NAME_SIZE];
+  char weapon_1[10];//corresponds to fire
+  char weapon_2[10];//corresponds to sword
 };
 
 //Globals for stats
@@ -171,6 +173,7 @@ float npc_power(float damage, struct NPC* p);
 void print_battle_screen_main (struct NPC* p, struct Player_Stats* q);
 int battle_buttons(int button_types);
 void submit_log(char input[],int status, int print_or_not);
+void random_stats(int skill_count,struct NPC* p);
 
 //Foreward declarations of skill upgrade functions 
 void print_divide(void);
@@ -193,6 +196,141 @@ void print_done_button(int button_state);
 void print_stat_upgrade(int x,int y, struct Player_Stats* p, bool reset_button_state);
 void print_like_typing(char *s, int speed);
 
+//**************************************************************SKILL SETTING FUNCTIONS**************************************************************
+void random_stats(int skill_count,struct NPC* p){
+}
+int NPC_stat_selector(int input, int skill_count,  struct NPC* p){
+  switch(input){
+  case 0: random_stats(skill_count,p); break;
+  case 1: //Enemy 1 noob
+  p->type=1;//Noob exists to just show the player how each skill works
+  p->block=1;
+  p->dodge=1;
+  p->sword=1;
+  p->power=1;
+  p->heal=1;
+  p->fire=1;
+  p->armor=1;
+  p->health=100;
+  p->maxhealth=100;
+  return 1;
+  break;
+  case 2: //Enemy 2 crack addict
+  p->type=2;
+  p->block=0;//Crack addict needs to be killed with preferably a perfect attack
+  p->dodge=15;
+  p->sword=2;
+  p->power=0;
+  p->heal=0;
+  p->fire=0;
+  p->armor=1;
+  p->health=1;
+  p->maxhealth=1;
+  return 2;
+  break;
+  case 3:
+  p->type=3;//Gabe has a lot of health and can only be practically defeated with the number 3
+  random_stats(skill_count,p);
+  p->health=10000;
+  p->maxhealth=10000;
+  return 3;
+  break;
+  case 4:
+  p->type=4;//Lincoln needs to be a tough enemy who you should probably just listen to instead of fighting
+  p->block=5;//If you skip lincolns speech you have to fight him, if you listen you get his hat
+  p->dodge=4;
+  p->sword=6;
+  p->power=3;
+  p->heal=1;
+  p->fire=4;
+  p->armor=5;
+  p->health=400;
+  p->maxhealth=400;
+  return 4;
+  break;
+  case 5://Mark zuckerberg
+  p->type=5;
+  random_stats(skill_count,p);
+  return 5;
+  break;
+  case 6://John Eldon
+  p->type=6;
+  random_stats(skill_count,p);
+  return 6;
+  break;
+  case 7://Gandalf the grey
+  p->type=7;
+  p->block=9;//Gandalf says "YOU SHALL NOT PASS!! when he blocks. He also has a high block skill.... gee I wonder why?
+  p->dodge=0;
+  p->sword=6;
+  p->power=5;
+  p->heal=1;
+  p->fire=5;
+  p->armor=0;
+  p->health=300;
+  p->maxhealth=300;
+  return 7;
+  break;
+  case 8://Its a lizard
+  p->type=8;
+  p->block=0;//Heals very quickly!
+  p->dodge=0;
+  p->sword=3;
+  p->power=0;
+  p->heal=10;
+  p->fire=0;
+  p->armor=0;
+  p->health=500;
+  p->maxhealth=500;
+  return 8;
+  break;
+  case 9://Glados
+  p->type=9; //She tries to throw you into a fire pit
+  p->block=0;
+  p->dodge=0;
+  p->sword=1;
+  p->power=10;
+  p->heal=0;
+  p->fire=10;
+  p->armor=10;
+  p->health=700;
+  p->maxhealth=700;
+  return 9;
+  break;
+  case 10://Gandalf the white!!
+  p->type=10;//Second to final special enemy!!
+  p->block=8;
+  p->dodge=7;
+  p->sword=10;
+  p->power=9;
+  p->heal=9;
+  p->fire=10;
+  p->armor=0;
+  p->health=800;
+  p->maxhealth=800;
+  return 10;
+  break;
+  case 11://Final boss (the developers)
+  p->type=11;
+  p->block=10;
+  p->dodge=10;
+  p->sword=10;//Good luck killing this
+  p->power=10;
+  p->heal=10;
+  p->fire=10;
+  p->armor=10;
+  p->health=1000;
+  p->maxhealth=1000;
+  return 11;
+  break;
+
+  default:
+    return 11;
+    break;
+  }
+
+
+}
 //**************************************************************RESET FUNCTIONS**************************************************************
 
 void reset_npc_stats(struct NPC* NPC){//Used between fights to make sure there is no spill over
