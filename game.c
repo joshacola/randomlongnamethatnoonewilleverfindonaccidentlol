@@ -15,10 +15,10 @@
 #define PLAYER_HEAL_PER_FIGHT_COEFF .08 //Percent of max health you heal after each fight per heal skill
 #define PLAYER_FIRE_COEFF 6 //This is multiplied by fire skill for base fire damage 
 #define PLAYER_SWORD_COEFF 8 //This times sword skill gives base output damage 
-#define PLAYER_BLOCK_COEFF .08 //Amount of damage percent removed per skill of block 
+#define PLAYER_BLOCK_COEFF .07 //Amount of damage percent removed per skill of block
 #define PLAYER_DODGE_COEFF .065 //Chance to dodge per skill level 
 #define PLAYER_POWER_COEFF .03 //Percent increase in damage per level 
-#define PLAYER_ARMOR_COEFF .05 //How much damage percent gets lowered by armor skill
+#define PLAYER_ARMOR_COEFF .039 //How much damage percent gets lowered by armor skill
 
 //PLAYER MODIFIERS
 
@@ -46,7 +46,7 @@
 
 //NPC COEFFICIENTS
 
-#define NPC_HEAL_COEFF .08 //Multiplied by heal skill to heal after each round 
+#define NPC_HEAL_COEFF .03 //Multiplied by heal skill to heal after each round
 #define NPC_FIRE_COEFF 8 //Multiplied by fire skill for base damage 
 #define NPC_SWORD_COEFF 11 //Multiplied by sword skill for base damage 
 #define NPC_ARMOR_COEFF .05 //Percent damage not taken per armor skill 
@@ -131,6 +131,7 @@ int type_speed_setting = 15000;
 char journal[25000][72];
 int journal_status[25000];
 int journal_entry=0;
+int print_counter= 0;
 
 //**************************************************************FUNCTION FOREWARD DECLARATIONS*********************************************************
 
@@ -388,7 +389,27 @@ void clear_log(){
     }
 }
 
+void print_log2(void){
+    clear_log();
+    
+    journal_entry--;
+    for(int i=0;i<10;i++){
+        if(journal_entry-9+i>-1){
+            printf("\033[%d;%dH%s", 2+2*i, 40,journal[journal_entry-9+i]); fflush(stdout);
+        }}
+    printf("\033[%d;%dH", 20, 40); fflush(stdout);
+    printf("%s", journal[journal_entry]);
+    journal_entry++;
+}
+
 void print_log(void){
+    if (print_counter >= 9){
+        go_on();
+        
+    }
+    else {
+        print_counter++;
+    }
     clear_log();
 
     journal_entry--;
@@ -446,10 +467,9 @@ void name_input(struct Player_Stats* p){
         }
     }
     while(i < MAX_NAME_SIZE){
-        string[i] = ' ';
+        string[i] = '\0';
         i++;
     }
-    string[MAX_NAME_SIZE - 1] = '\0';
     for (int i = 0; i < MAX_NAME_SIZE; i++){
         p->name[i] = string[i];
     }
@@ -481,6 +501,7 @@ void go_on(void){//Asks user to press any key to continue
     while(temp == 0) temp = system("read -t 1 -n 10000 discard");
     printf("\033[22;40H                       PRESS ANY KEY TO CONTINUE"); fflush(stdout);
     getcha();
+    print_counter = 0;
 }
 
 void submit_log(char input[], int status,int print_or_not){
@@ -529,7 +550,7 @@ void endscreen (struct Player_Stats* p){//Prints the ending of the game SHOULD M
 
 void  battle_screen (int state,struct NPC* p, struct Player_Stats* q){//does all battle screen functions at once
     print_battle_screen_main(p, q);
-    print_log();
+    print_log2();
     battle_buttons(3);
    return;
  }
@@ -542,7 +563,7 @@ void check_player_health(struct Player_Stats* p){//If player is dead game will e
 }
 
 int check_npc_health(struct NPC* p){//If the NPC is dead it will return a 0, 1 if alive
-  if(p->health<0){
+  if(p->health<=0){
     p->health=0;
     printf("| The NPC is dead!                                                           |\n");//Eliminate printfs
   //printf("|----------------------------------------------------------------------------|\n");
@@ -823,7 +844,7 @@ void skill_upgrade(int i,struct Player_Stats* p)
 
               }
               if (i == 0){
-                  button_state = 8;
+                  button_state = 9;
               }
           }
           else {
@@ -1002,7 +1023,7 @@ void skill_upgrade(int i,struct Player_Stats* p)
 
                   }
                   if (i == 0){
-                      button_state = 8;
+                      button_state = 9;
                   }
                   break;
               default:
@@ -1031,22 +1052,20 @@ float player_block(float damage,struct Player_Stats* p)
   snprintf(journal_block,72,"You decided to block!");
   submit_log(journal_block,1,1);
   char input;
-  int savedamage;
+  float savedamage = damage;
   if(p->block>PERFECT_UNLOCK_LEVEL && p->perf_block !=0){
     snprintf(journal_block,72,"Do you want to use a perfect block?");
     submit_log(journal_block,0,1);
     input=battle_buttons(2);
+      
     if(input==0){
-      damage=0;
       snprintf(journal_block,72,"You performed a perfect block and received zero damage!");
       submit_log(journal_block,1,1);
       p->perf_block--;
-      return damage;}
+      return 0;}
     else{
     }
   }
-  savedamage=damage;
-  time_t t;
   int extra_block=0;
   extra_block=( rand () % PLAYER_BLOCK_MOD);
   if(p->block==0){damage=damage*.95-extra_block;
@@ -1061,23 +1080,24 @@ float player_block(float damage,struct Player_Stats* p)
   return damage;
 }
 float player_armor(float damage,struct Player_Stats* p){
-  char journal_armor[72];
-  time_t t;
+  float savedamage=damage;
+    char journal_armor[72];
   int threshold=0;
   int random_number=0;
   random_number=( rand () % 100); 
   if(p->armor>PERFECT_UNLOCK_LEVEL && p->perf_armor!=0 && damage!=0){
-    snprintf(journal_armor,72,"You have a %d chance to take zero damage with perfect armor!",PERFECT_ARMOR_MOD);
+    snprintf(journal_armor,72,"You have a %d chance to take zero damage with perfect armor!",PERFECT_ARMOR_MOD+p->armor);
     submit_log(journal_armor,0,1);
-    if(random_number<16){
+    if(random_number<PERFECT_ARMOR_MOD+p->armor){
       snprintf(journal_armor,72,"You used a perfect armor!");
       submit_log(journal_armor,1,1);
       p->perf_armor--;
       return 0;
-    }}
-  float savedamage=damage;
+    }
+      submit_log("You did not use a perfect armor",1,1);
+  }
   damage=damage*(1-(p->armor*PLAYER_ARMOR_COEFF));
-  snprintf(journal_armor,72,"Your armor stopped %f damage!",savedamage-damage);
+  snprintf(journal_armor,72,"Your armor stopped %f damage!",(savedamage-damage));
   submit_log(journal_armor,1,1);
   return damage;
 }
@@ -1088,6 +1108,7 @@ int player_dodge(struct Player_Stats* p){
     snprintf(journal_dodge,72,"Do you want to use a perfect dodge?");
     submit_log(journal_dodge,0,1);
     input=battle_buttons(2);
+      
     if(input==0){
       snprintf(journal_dodge,72,"You performed a perfect dodge!");
       submit_log(journal_dodge,1,1);
@@ -1104,7 +1125,7 @@ int player_dodge(struct Player_Stats* p){
   int random_number=0;
   random_number=( rand () % 100);
   threshold=100*(p->dodge*PLAYER_DODGE_COEFF);
-  snprintf(journal_dodge,72,"Your dodge skills give you a %d to dodge",threshold);
+  snprintf(journal_dodge,72,"Your dodge skills give you a %d%% chance to dodge",threshold);
   submit_log(journal_dodge,1,1);
   if(random_number<threshold){
     snprintf(journal_dodge,72,"You dodged and avoided all damage!");
@@ -1143,8 +1164,10 @@ float player_fire(struct Player_Stats* p){
    if(p->fire>PERFECT_UNLOCK_LEVEL && p->perf_fire !=0){
     snprintf(journal_fire, 72, "Do you want to augment your attack with a perfect fire?");
     submit_log(journal_fire,0,1);
-       input = battle_buttons(2); //2 means yes or no
+       input = battle_buttons(2);
+       //2 means yes or no
        //returns 0: yes, 1: no
+       
     if(input==0){
       perfect_state=1;
       snprintf(journal_fire,72,"Your perfect fire attack has a larger random contribution!");
@@ -1175,7 +1198,9 @@ float player_sword(struct Player_Stats* p){
    if(p->sword>PERFECT_UNLOCK_LEVEL && p->perf_sword !=0){
     snprintf(journal_sword, 72, "Do you want to use a perfect sword attack?"); 
     submit_log(journal_sword,0,1);
-    input = battle_buttons(2); //2 means yes or no
+    input = battle_buttons(2);
+       
+       //2 means yes or no
        //returns 0: yes, 1: no
     if(input==0){
       perfect_state=1;
@@ -1225,6 +1250,7 @@ void player_heal(struct Player_Stats* p){
     else{snprintf(journal_heal,72,"You currently have %d perfect heals available.",p->perf_heal);}
     submit_log(journal_heal,0,1);
     input = battle_buttons(2);
+       
     if(input==0){
       snprintf(journal_heal,72,"You performed a perfect heal!");
       submit_log(journal_heal,1,1);
@@ -1253,11 +1279,18 @@ float player_power(float damage,struct Player_Stats *p){
   char journal_power[72];
   random_number=( rand () % 100);
   if(p->power>PERFECT_UNLOCK_LEVEL && p->perf_power>0){
-    if(random_number<PERFECT_POWER_MOD){
+      snprintf(journal_power,72,"You have a %d%% chance of getting a perfect power",PERFECT_POWER_MOD+p->power);
+      submit_log(journal_power,0,1);
+    if(random_number<(PERFECT_POWER_MOD+p->power)){
       damage=PERFECT_POWER_MULTIPLIER*damage;
-      return damage;}}
+        snprintf(journal_power,72,"Your scored a perfect power and multiplied your damage by %d!",PERFECT_POWER_MULTIPLIER);
+        submit_log(journal_power,1,1);
+      return damage;}
+      snprintf(journal_power,72,"You did not score a perfect power.");
+      submit_log(journal_power,1,1);
+  }
   damage=damage+damage*(p->power*PLAYER_POWER_COEFF);
-  printf("Your power increased your damage by %f!\n",damage-savedamage);
+  //printf("Your power increased your damage by %f!\n",damage-savedamage);
   snprintf(journal_power,72,"Your power increased your damage by %f!",damage-savedamage);
   submit_log(journal_power,1,1);
   return damage;
@@ -1270,6 +1303,7 @@ void player_defense(float damage,struct Player_Stats* p){
   float finaldamage;
   int dodge_success=0;
   char input = battle_buttons(1);
+    
  restart_defense :
   switch(input){
       case 1 :
@@ -1330,12 +1364,14 @@ int npc_dodge(struct NPC* p){
       snprintf(journal_dodge,72,"They dodged!");
       submit_log(journal_dodge,1,1);
       return 1;}
-    printf("They did not dodge!\n");
+    //printf("They did not dodge!\n");
     snprintf(journal_dodge,72,"They did not dodge.");
     submit_log(journal_dodge,1,1);
     return 0;}
 
-  printf("The enemy tried to stupidly dodge your perfect attack!\n");
+//  printf("The enemy tried to stupidly dodge your perfect attack!\n");
+    snprintf(journal_dodge,72,"The enemy tried to stupidly dodge your perfect attack!");
+    submit_log(journal_dodge,1,1);
   perfect_state=0;
   return 0;
 }
@@ -1352,12 +1388,13 @@ float npc_heal(struct NPC* p){
   char journal_heal[72];
   float heal_amount=0;
   int random_number=0;
-  random_number=( rand () % NPC_HEAL_MOD);
+  random_number=( rand () % (NPC_HEAL_MOD+p->heal));
   if(p->heal==0){
-      heal_amount=p->maxhealth*NPC_HEAL_COEFF;
+      heal_amount = 0;
+      /*heal_amount=p->maxhealth*NPC_HEAL_COEFF;
       heal_amount+=random_number;
       if (p->health+heal_amount > p->maxhealth) heal_amount = p->maxhealth - p->health;
-    p->health=p->health+heal_amount;
+    p->health=p->health+heal_amount;*/
     return heal_amount;}
   heal_amount=p->maxhealth*NPC_HEAL_COEFF*p->heal+random_number;
     if (heal_amount+p->health > p->maxhealth) heal_amount = p->maxhealth - p->health;
@@ -1397,6 +1434,7 @@ void npc_defense(float damage,struct NPC* p){
 float player_attack(struct Player_Stats* p){
   float damage=0;
   char input = battle_buttons(0);
+    
     switch(input){
         case 1 :
             damage=player_fire(p);
@@ -1490,15 +1528,20 @@ void battle(struct NPC* p,struct Player_Stats* q){
   while(npc_alive){
      battle_screen(0,p,q);
       battle_buttons(3);
+      submit_log(" ", 0, 1);
+      submit_log("It is your turn to attack!", 0, 1);
     damage=player_attack(q);
     if(damage==0){
       snprintf(journal_battle,72,"Since you healed the enemy does not need to defend.");
       submit_log(journal_battle,1,1);
       goto npc_attack;}
     npc_defense(damage,p);
+      battle_screen(0,p,q);
     npc_alive=check_npc_health(p);
     if(npc_alive==0){break;}
+      submit_log("                                                                       ", 0, 1);
   npc_attack :
+      go_on();
     npc_heal(p);
     snprintf(journal_battle,72,"It is the enemy attack turn.");
     submit_log(journal_battle,1,1);
@@ -1515,8 +1558,22 @@ void print_battle_screen_main (struct NPC* p, struct Player_Stats* q){
     fflush(stdout); system("clear");
     printf("0====================================0=========================================================================0====================================0\n");
     printf("||                                   |                                                                         |                                   ||\n");
-    printf("||   %s           ",q->name);
+    printf("||   %s            ",q->name);
+    int this_flag = 0;
+    for (int i = 0; i < 20; i++){
+        if (q->name[i] == '\0' || this_flag == 1){
+            printf(" ");
+            this_flag = 1;
+        }
+    }
+    this_flag = 0;
     printf("|                                                                         |     %s          ", p->name);
+    for (int i = 0; i < 20; i++){
+        if (p->name[i] == '\0' || this_flag == 1){
+            printf(" ");
+            this_flag = 1;
+        }
+    }
     printf("||\n");
     printf("||                                   |                                                                         |                                   ||\n");
     printf("||   HP : %8.2f/%-8.2f          |                                                                         |     HP : %8.2f/%-8.2f        ||\n", q->health, q->maxhealth, p->health, p->maxhealth);
@@ -1577,6 +1634,7 @@ int battle_buttons(int button_types){
         return 0;
     }
     else {
+        print_counter = 0;
         //which button is selected
         char input = 0;
         while(1){
@@ -1670,16 +1728,16 @@ int  main(){
     //tutorial();
     struct Player_Stats q;
     reset_player_stats(&q);
-    //gift_player_stats(&q);
+    gift_player_stats(&q);
     name_input(&q);
     struct NPC noob;//Enemy one!
-    char npc_name[] = "this is 20 char str!";
+    char npc_name[] = "!";
     for (int i = 0; i < 21; i++){
         noob.name[i]=npc_name[i];
     }
     noob.armor=0;
-    noob.fire=1;
-    noob.sword=1;
+    noob.fire=10;
+    noob.sword=10;
     noob.block=2;
     noob.dodge=0;
     noob.health=1000;
@@ -1687,7 +1745,7 @@ int  main(){
     noob.maxhealth=1000;
     noob.heal = 0;
     battle_screen(0, &noob, &q);
-    skill_upgrade(15, &q);
+    //skill_upgrade(15, &q);
     battle(&noob,&q);
 return 0;
 }
