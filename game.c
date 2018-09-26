@@ -93,6 +93,7 @@ struct NPC {
   int armor;
   int heal;
   int power;
+  int type;
   float health;
   float maxhealth;
   char name[MAX_NPC_NAME_SIZE];
@@ -199,6 +200,7 @@ void print_like_typing(char *s, int speed);
 
 //**************************************************************SKILL SETTING FUNCTIONS**************************************************************
 void random_stats(int skill_count,struct NPC* p){
+  
 }
 int NPC_stat_selector(int input, int skill_count,  struct NPC* p){
   switch(input){
@@ -329,8 +331,7 @@ int NPC_stat_selector(int input, int skill_count,  struct NPC* p){
     return 11;
     break;
   }
-
-
+  return 0;
 }
 //**************************************************************RESET FUNCTIONS**************************************************************
 
@@ -1728,7 +1729,7 @@ int  main(){
     //tutorial();
     struct Player_Stats q;
     reset_player_stats(&q);
-    gift_player_stats(&q);
+    //gift_player_stats(&q);
     name_input(&q);
     struct NPC noob;//Enemy one!
     char npc_name[] = "!";
@@ -1745,7 +1746,7 @@ int  main(){
     noob.maxhealth=1000;
     noob.heal = 0;
     battle_screen(0, &noob, &q);
-    //skill_upgrade(15, &q);
+    skill_upgrade(45, &q);
     battle(&noob,&q);
 return 0;
 }
