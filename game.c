@@ -1,6 +1,21 @@
 //REILLY JENSEN ARENA GAME 8-15-18
 //**************************************************************INCLUDES**************************************************************
 
+/*Reilly need to do : 
+-Write a random npc stat selector function
+-Perfect accumulator function (ensure that perfect heal cant be exploited)
+-Integrate stat recorder struct wherever needed
+-When increasing maxhealth, also heal health by +20
+-Heal skill does not seem to update screen fast enough
+ */
+
+/*Josh need to do :
+-Update journal function
+-Integrate stat lookup and journal scrolling
+-Find a way to continually poll what the size of terminal is
+-Begin writing a way to resize battle UI based on size of terminal 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -101,35 +116,39 @@ struct NPC {
   char weapon_1[10];//corresponds to fire
   char weapon_2[10];//corresponds to sword
 };
+//Globals for records
+int total_fire_attacks;
+float total_damage_by_fire;
+int total_sword_attacks;
+float total_damage_by_sword;
+int total_heals;
+int total_dodges;
+int total_failed_dodges;
+int total_blocks;
+float total_damage_blocked;
+float total_damage_negated_by_armor;
+float total_damage_boosted_by_power;
+float total_damage_taken;
+float total_damage_given;
+float strongest_ever_attack;
+int strongest_ever_fire;
+int strongest_ever_sword;
+int strongest_ever_heal;
+float strongest_ever_attack_survived;
+float most_health;
+int total_perfect_fires;
+int total_perfect_swords;
+int total_perfect_heals;
+int total_perfect_dodges;
+int total_perfect_blocks;
+int total_perfect_armors;
+int total_perfect_powers;
+int total_enemies_slain;
+int final_bosses_killed;
 
-//Globals for stats
-int total_fire_attacks=0;
-float total_damage_by_fire=0;
-int total_sword_attacks=0;
-float total_damage_by_sword=0;
-int total_heals=0;
-int total_dodges=0;
-int total_blocks=0;
-float total_damage_blocked=0;
-float total_damage_negated_by_armor=0;
-float total_damage_boosted_by_power=0;
-float total_damage_taken=0;
-float total_damage_given=0;
-float strongest_ever_attack=0;
-float strongest_ever_attack_survived=0;
-float most_health=100;
-int total_perfect_fires=0;
-int total_perfect_swords=0;
-int total_perfect_heals=0;
-int total_perfect_dodges=0;
-int total_perfect_blocks=0;
-int total_perfect_armors=0;
-int total_perfect_powers=0;
-int total_enemies_slain=0;
-int final_bosses_killed=0;
+//Globals
 int perfect_state=0;
 int type_speed_setting = 15000;
-
 char journal[25000][72];
 int journal_status[25000];
 int journal_entry=0;
@@ -345,6 +364,34 @@ int NPC_stat_selector(int input, int skill_count,  struct NPC* p){
   return 0;
 }
 //**************************************************************RESET FUNCTIONS**************************************************************
+
+void reset_records(void){//This wipes all your stats
+total_fire_attacks=0;
+total_damage_by_fire=0;
+total_sword_attacks=0;
+total_damage_by_sword=0;
+total_heals=0;
+total_dodges=0;
+total_failed_dodges=0;
+total_blocks=0;
+total_damage_blocked=0;
+total_damage_negated_by_armor=0;
+total_damage_boosted_by_power=0;
+total_damage_taken=0;
+total_damage_given=0;
+strongest_ever_attack=0;
+strongest_ever_attack_survived=0;
+most_health=100;
+total_perfect_fires=0;
+total_perfect_swords=0;
+total_perfect_heals=0;
+total_perfect_dodges=0;
+total_perfect_blocks=0;
+total_perfect_armors=0;
+total_perfect_powers=0;
+total_enemies_slain=0;
+final_bosses_killed=0;
+}
 
 void reset_npc_stats(struct NPC* NPC){//Used between fights to make sure there is no spill over
   NPC->block=0;
@@ -686,7 +733,14 @@ char* npc7_insults[] = {//John Eldon
 char* npc8_insults[] = {//Gandalf the Grey
     "YOU SHALL NOT PASS!!!!!",
     "I am never late, nor am I early! I arrive precisely when I mean to!",
-    "Fool! Toss yourself aside and rid us of your stupidity!"
+    "Fool! Toss yourself aside and rid us of your stupidity!",
+    "It was pity that stayed bilbos hand but it wont stop mine!",
+    "Many that die deserve life, and many that live deserve death INCLUDING YOU!",
+    "There is only one lord of the ring and he does not share power!",
+    "All you have to decide is what to do with the time that is given to you, what little you have left!",
+    "Your sword is of no more use here!",
+    "I am a foe beyond you! A force of the ancient world! RUN!!"
+    "I am a servant of the secret fire, weilder of the flame of arnor! The dark fire will not avail you flame of udun!!"
 };
 char* npc9_insults[] = {//JFK
     "I will give you peace! The peace of the grave, or the security of the slave!",
@@ -722,7 +776,6 @@ char* npc12_insults[] = {//The developers
      "Dont be a dickbag!",
      "rip"
 };
-
 void npc_insult(int which_npc) {
     int insults_per_npc = 0;
     switch (which_npc) {
@@ -783,12 +836,10 @@ void npc_insult(int which_npc) {
     }
     return;
 }
-
- 
 //**************************************************************CHECK FUNCTIONS************************************************************
 
 void check_player_health(struct Player_Stats* p){//If player is dead game will end
-  if(p->health<0){endscreen(p);}
+  if(p->health<=0){endscreen(p);}
   return;
 }
 
@@ -800,7 +851,6 @@ int check_npc_health(struct NPC* p){//If the NPC is dead it will return a 0, 1 i
     return 0;}
   return 1;
 }
-
 //**************************************************************SKILL UPGRADE FUNCTIONS********************************************************
 
 //     DO NOT CHANGE ORDER!!!!  (I foreward declared them anyway) 
@@ -972,7 +1022,6 @@ void print_stat_upgrade(int x, int y, struct Player_Stats* p, bool reset_button_
     print_done_button(button_state);
     print_divide();
 }
-
 void skill_upgrade(int i,struct Player_Stats* p)
 {
     struct Player_Stats q = *p;
@@ -1272,12 +1321,10 @@ void skill_upgrade(int i,struct Player_Stats* p)
       }
     }
 }
-
 //**************************************************************PLAYER DEFENSE FUNCTIONS**************************************************************
-
-
 float player_block(float damage,struct Player_Stats* p)
 {
+  total_blocks++;
   char journal_block[72];
   snprintf(journal_block,72,"You decided to block!");
   submit_log(journal_block,1,1);
@@ -1307,11 +1354,12 @@ float player_block(float damage,struct Player_Stats* p)
   if(damage<0){damage=0;}
   snprintf(journal_block,72,"Your normal block stopped %f damage",savedamage-damage);
   submit_log(journal_block,1,1);
+  total_damage_blocked=total_damage_blocked+damage;
   return damage;
 }
 float player_armor(float damage,struct Player_Stats* p){
   float savedamage=damage;
-    char journal_armor[72];
+  char journal_armor[72];
   int threshold=0;
   int random_number=0;
   random_number=( rand () % 100); 
@@ -1329,6 +1377,7 @@ float player_armor(float damage,struct Player_Stats* p){
   damage=damage*(1-(p->armor*PLAYER_ARMOR_COEFF));
   snprintf(journal_armor,72,"Your armor stopped %f damage!",(savedamage-damage));
   submit_log(journal_armor,1,1);
+  total_damage_negated_by_armor=total_damage_negated_by_armor+damage;
   return damage;
 }
 int player_dodge(struct Player_Stats* p){
@@ -1341,6 +1390,7 @@ int player_dodge(struct Player_Stats* p){
       
     if(input==0){
       snprintf(journal_dodge,72,"You performed a perfect dodge!");
+      total_dodges++;
       submit_log(journal_dodge,1,1);
       p->perf_dodge--;
       return 1;
@@ -1359,9 +1409,11 @@ int player_dodge(struct Player_Stats* p){
   submit_log(journal_dodge,1,1);
   if(random_number<threshold){
     snprintf(journal_dodge,72,"You dodged and avoided all damage!");
+    total_dodges++;
     submit_log(journal_dodge,1,1);
     return 1;}
   snprintf(journal_dodge,72,"You did not dodge.");
+  total_failed_dodges++;
   submit_log(journal_dodge,1,1);
   return 0;
 }
@@ -1382,10 +1434,9 @@ float player_heal_after_battle(struct Player_Stats* p){
    submit_log(journal_heal,1,1);
    return p->health-savehealth;
  }
-
 //**************************************************************PLAYER ATTACK FUNCTIONS**************************************************************
-
 float player_fire(struct Player_Stats* p){
+  total_fire_attacks++;
   char input;
   char journal_fire[72];
   int perfect_modifier=0;
@@ -1417,9 +1468,12 @@ float player_fire(struct Player_Stats* p){
   output_damage=p->fire*PLAYER_FIRE_COEFF+random_modifier;
   snprintf(journal_fire, 72, "Fire power is  %-8.2f",output_damage);
   submit_log(journal_fire,1,1);
+  total_damage_by_fire=total_damage_by_fire+output_damage;
+  if(strongest_ever_fire<output_damage){strongest_ever_fire=output_damage;}
   return output_damage;
 }
 float player_sword(struct Player_Stats* p){
+  total_sword_attacks++;
   char journal_sword[72];
   char input;
   int perfect_modifier=0;
@@ -1453,9 +1507,12 @@ float player_sword(struct Player_Stats* p){
   snprintf(journal_sword,72,"Your sword is doing %f damage!",output_damage+random_modifier);
   submit_log(journal_sword,1,1);
   output_damage=output_damage+random_modifier;
+  total_damage_by_sword=total_damage_by_sword+output_damage+random_modifier;
+  if(output_damage+random_modifier>strongest_ever_sword){strongest_ever_sword=output_damage+random_modifier;}
   return output_damage+random_modifier;
 }
 void player_heal(struct Player_Stats* p){
+  total_heals++;
   char journal_heal[72];
   snprintf(journal_heal,72,"You decided to heal instead of attacking.");
   submit_log(journal_heal,1,1);
@@ -1483,11 +1540,13 @@ void player_heal(struct Player_Stats* p){
        
     if(input==0){
       snprintf(journal_heal,72,"You performed a perfect heal!");
+      total_perfect_heals++;
       submit_log(journal_heal,1,1);
       p->perf_heal--;
       p->maxhealth=p->maxhealth+PLAYER_MAX_HEALTH_PER_PERFECT_HEAL;
       p->health=p->maxhealth;
       snprintf(journal_heal,72,"You healed a %f amount of points!",p->health-healthprior);
+      if(p->health-healthprior>strongest_ever_heal){strongest_ever_heal=p->health-healthprior;}
       submit_log(journal_heal,1,1);
       return;
       }
@@ -1499,10 +1558,10 @@ void player_heal(struct Player_Stats* p){
    p->health=p->health+(.35*(p->maxhealth*(p->heal*.08))+random_modifier)+p->maxhealth*.1;
    if(p->health>p->maxhealth){p->health=p->maxhealth;}
    snprintf(journal_heal,72,"You healed %f points!",p->health-healthprior);
+   if(p->health-healthprior>strongest_ever_heal){strongest_ever_heal=p->health-healthprior;}
    submit_log(journal_heal,1,1);
    return;
 }
-
 float player_power(float damage,struct Player_Stats *p){
   int random_number=0;
   float savedamage=damage;
@@ -1514,6 +1573,7 @@ float player_power(float damage,struct Player_Stats *p){
     if(random_number<(PERFECT_POWER_MOD+p->power)){
       damage=PERFECT_POWER_MULTIPLIER*damage;
         snprintf(journal_power,72,"Your scored a perfect power and multiplied your damage by %d!",PERFECT_POWER_MULTIPLIER);
+	total_perfect_powers++;
         submit_log(journal_power,1,1);
       return damage;}
       snprintf(journal_power,72,"You did not score a perfect power.");
@@ -1523,8 +1583,8 @@ float player_power(float damage,struct Player_Stats *p){
   //printf("Your power increased your damage by %f!\n",damage-savedamage);
   snprintf(journal_power,72,"Your power increased your damage by %f!",damage-savedamage);
   submit_log(journal_power,1,1);
+  total_damage_boosted_by_power=total_damage_boosted_by_power+damage;
   return damage;
-
 }
 //**************************************************************PLAYER GENERAL DEFENSE FUNCTION**************************************************************
 void player_defense(float damage,struct Player_Stats* p){
@@ -1633,9 +1693,7 @@ float npc_heal(struct NPC* p){
   submit_log(journal_heal,1,1);
   return heal_amount;
 }
-
 //**************************************************************NPC GENERAL DEFENSE FUNCTION**************************************************************
-
 void npc_defense(float damage,struct NPC* p){
   float next_damage;
   float final_damage;
@@ -1658,9 +1716,7 @@ void npc_defense(float damage,struct NPC* p){
   return;
 
 }
-
 //**************************************************************PLAYER GENERAL ATTACK FUNCTION**************************************************************
-
 float player_attack(struct Player_Stats* p){
   float damage=0;
   char input = battle_buttons(0);
@@ -1687,9 +1743,7 @@ float player_attack(struct Player_Stats* p){
     final_damage=player_power(damage,p);
   return final_damage;
 }
-
 //**************************************************************NPC GENERAL ATTACK FUNCTION*******************************************************
-
 float npc_attack(struct NPC* p){
   char journal_attack[72];
   snprintf(journal_attack,72,"The enemy is deciding whether to use fire or sword.");
@@ -1711,10 +1765,7 @@ float npc_attack(struct NPC* p){
   final_damage=npc_power(damage,p);
   return final_damage;
 }
-
-
 //**************************************************************NPC ATTACK FUNCTIONS**************************************************************
-
 float npc_sword(struct NPC* p){
   char journal_sword[72];
   int random_modifier=0;
@@ -1738,7 +1789,6 @@ float npc_fire(struct NPC* p){
   //npc_power(output_damage,p);
   return output_damage;
 }
-
 float npc_power(float damage, struct NPC* p){
   char journal_power[72];
   float savedamage=damage;
@@ -1747,9 +1797,7 @@ float npc_power(float damage, struct NPC* p){
   submit_log(journal_power,1,1);
   return damage;
 }
-
 //**************************************************************BATTLE FUNCTION************************************************************
-
 void battle(struct NPC* p,struct Player_Stats* q){
   char journal_battle[72];
   int npc_alive=1;
@@ -1780,9 +1828,7 @@ void battle(struct NPC* p,struct Player_Stats* q){
     submit_log(journal_battle,1,1);
     player_defense(damage,q);
   }}
-
 //**************************************************************PRINT BATTLE SCREEN**************************************************************
-
 void print_battle_screen_main (struct NPC* p, struct Player_Stats* q){
     printf("\e[8;28;149t");
     fflush(stdout); system("clear");
@@ -1855,7 +1901,6 @@ void print_battle_screen_buttons(int button_state, int selected){
     }
     printf("0====================================0====================================0====================================0====================================0\n");
 }
-
 int battle_buttons(int button_types){
     //which state the buttons are in
     int button_state = 0;
@@ -1948,8 +1993,6 @@ int battle_buttons(int button_types){
     }
 }
 //**************************************************************MAIN FUNCTION**************************************************************
-
-
 int  main(){
     printf("\e[8;28;149t");
     printf("\e[?25l");
