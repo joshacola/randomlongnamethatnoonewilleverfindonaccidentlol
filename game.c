@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <time.h>
 #include <stdbool.h>
 #include <termios.h>
@@ -555,6 +556,159 @@ void  battle_screen (int state,struct NPC* p, struct Player_Stats* q){//does all
     battle_buttons(3);
    return;
  }
+
+//**************************************************************INSULT GENERATOR************************************************************
+
+char const * const verbs[] = {
+    "cry",
+    "run",
+    "fight",
+    "crawl",
+    "dance",
+};
+const size_t number_of_verbs = sizeof(verbs) / sizeof(verbs[0]);
+
+char const * const nouns[] = {
+    "slug",
+    "tree",
+    "mudcrab",
+    "mad crab",
+    "drunk",
+    "tree",
+    "rock",
+    "god",
+};
+const size_t number_of_nouns = sizeof(nouns) / sizeof(nouns[0]);
+
+char const *random_verb() {
+    return verbs[rand() % number_of_verbs];
+}
+
+char const *random_noun() {
+    return nouns[rand() % number_of_nouns];
+}
+
+void insult1(void) {
+    printf("You %s like a %s!\n", random_verb(), random_noun());
+}
+
+void insult2(void) {
+    printf("I've fought %ss tougher than you!\n", random_noun());
+}
+
+void insult3(void) {
+    printf("You call that %sing?!\n", random_verb());
+}
+
+typedef void (*insult_printer)(void);
+insult_printer const insults[] = {
+    insult1,
+    insult2,
+    insult3,
+};
+const size_t number_of_insults = sizeof(insults) / sizeof(insults[0]);
+
+insult_printer random_insult(void) {
+    return insults[rand() % number_of_insults];
+}
+
+char* npc1_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc2_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc3_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc4_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc5_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc6_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc7_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc8_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+char* npc9_insults[] = {
+    "Insult 1",
+    "Insult 2",
+    "Insult 3"
+};
+
+void npc_insult(int which_npc) {
+    int insults_per_npc = 0;
+    switch (which_npc) {
+        case 0:
+            ; //cant decalare a variable after a :      (dont know why)
+            insult_printer insult = random_insult();
+            insult();
+            break;
+        case 1:
+            insults_per_npc = 1;
+            submit_log(npc1_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 2:
+            insults_per_npc = 1;
+            submit_log(npc2_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 3:
+            insults_per_npc = 1;
+            submit_log(npc3_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 4:
+            insults_per_npc = 1;
+            submit_log(npc4_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 5:
+            insults_per_npc = 1;
+            submit_log(npc5_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 6:
+            insults_per_npc = 1;
+            submit_log(npc6_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 7:
+            insults_per_npc = 1;
+            submit_log(npc7_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 8:
+            insults_per_npc = 1;
+            submit_log(npc8_insults[rand() % insults_per_npc], 0, 1);
+            break;
+        case 9:
+            insults_per_npc = 1;
+            submit_log(npc9_insults[rand() % insults_per_npc], 0, 1);
+            break;
+            
+        default:
+            break;
+    }
+    return;
+}
+
  
 //**************************************************************CHECK FUNCTIONS************************************************************
 
