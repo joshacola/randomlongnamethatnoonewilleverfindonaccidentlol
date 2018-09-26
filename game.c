@@ -204,132 +204,142 @@ void random_stats(int skill_count,struct NPC* p){
   
 }
 int NPC_stat_selector(int input, int skill_count,  struct NPC* p){
-  switch(input){
-  case 0: random_stats(skill_count,p); break;
-  case 1: //Enemy 1 noob
-  p->type=1;//Noob exists to just show the player how each skill works
-  p->block=1;
-  p->dodge=1;
-  p->sword=1;
-  p->power=1;
-  p->heal=1;
-  p->fire=1;
-  p->armor=1;
-  p->health=100;
-  p->maxhealth=100;
-  return 1;
-  break;
-  case 2: //Enemy 2 crack addict
-  p->type=2;
-  p->block=0;//Crack addict needs to be killed with preferably a perfect attack
-  p->dodge=15;
-  p->sword=2;
-  p->power=0;
-  p->heal=0;
-  p->fire=0;
-  p->armor=1;
-  p->health=1;
-  p->maxhealth=1;
-  return 2;
-  break;
-  case 3:
-  p->type=3;//Gabe has a lot of health and can only be practically defeated with the number 3
-  random_stats(skill_count,p);
-  p->health=10000;
-  p->maxhealth=10000;
-  return 3;
-  break;
-  case 4:
-  p->type=4;//Lincoln needs to be a tough enemy who you should probably just listen to instead of fighting
-  p->block=5;//If you skip lincolns speech you have to fight him, if you listen you get his hat
-  p->dodge=4;
-  p->sword=6;
-  p->power=3;
-  p->heal=1;
-  p->fire=4;
-  p->armor=5;
-  p->health=400;
-  p->maxhealth=400;
-  return 4;
-  break;
-  case 5://Mark zuckerberg
-  p->type=5;
-  random_stats(skill_count,p);
-  return 5;
-  break;
-  case 6://John Eldon
-  p->type=6;
-  random_stats(skill_count,p);
-  return 6;
-  break;
-  case 7://Gandalf the grey
-  p->type=7;
-  p->block=9;//Gandalf says "YOU SHALL NOT PASS!! when he blocks. He also has a high block skill.... gee I wonder why?
-  p->dodge=0;
-  p->sword=6;
-  p->power=5;
-  p->heal=1;
-  p->fire=5;
-  p->armor=0;
-  p->health=300;
-  p->maxhealth=300;
-  return 7;
-  break;
-  case 8://Its a lizard
-  p->type=8;
-  p->block=0;//Heals very quickly!
-  p->dodge=0;
-  p->sword=3;
-  p->power=0;
-  p->heal=10;
-  p->fire=0;
-  p->armor=0;
-  p->health=500;
-  p->maxhealth=500;
-  return 8;
-  break;
-  case 9://Glados
-  p->type=9; //She tries to throw you into a fire pit
-  p->block=0;
-  p->dodge=0;
-  p->sword=1;
-  p->power=10;
-  p->heal=0;
-  p->fire=10;
-  p->armor=10;
-  p->health=700;
-  p->maxhealth=700;
-  return 9;
-  break;
-  case 10://Gandalf the white!!
-  p->type=10;//Second to final special enemy!!
-  p->block=8;
-  p->dodge=7;
-  p->sword=10;
-  p->power=9;
-  p->heal=9;
-  p->fire=10;
-  p->armor=0;
-  p->health=800;
-  p->maxhealth=800;
-  return 10;
-  break;
-  case 11://Final boss (the developers)
-  p->type=11;
-  p->block=10;
-  p->dodge=10;
-  p->sword=10;//Good luck killing this
-  p->power=10;
-  p->heal=10;
-  p->fire=10;
-  p->armor=10;
-  p->health=1000;
-  p->maxhealth=1000;
-  return 11;
-  break;
+  /*
+1 noob
+2 Donald Trump
+3 Gabe Newell
+4 Mark Zuckerberg
+5 Abraham Lincoln
+6 NEO 
+7 Professor John Eldon
+8 Gandalf the Grey
+9 John Fitzgerald Kennedy
+10 G.L.A.D.O.S
+11 Gandalf the White 
+12 The developers
 
-  default:
+*/
+  switch(input){
+  case 0:
+    random_stats(skill_count,p);
+    return 0;
+    break;
+  case 1: //Enemy 1 noob
+    p->type=1;//Noob exists to just show the player how each skill works
+    p->block=1;
+    p->dodge=1;
+    p->sword=1;
+    p->power=1;
+    p->heal=1;
+    p->fire=1;
+    p->armor=1;
+    p->health=100;
+    p->maxhealth=100;
+    return 1;
+    break;
+  case 2: //Enemy 2 Donald_Trump
+    p->type=2;
+    p->block=11;//Trump has a high block skill, everything else is randomized 
+    p->health=200;
+    p->maxhealth=200;
+    return 2;
+    break;
+  case 3:
+    p->type=3;//Gabe has a lot of health and can only be practically defeated with the number 3
+    random_stats(skill_count,p);
+    p->health=10000;
+    p->maxhealth=10000;
+    return 3;
+    break;
+  case 4://Mark Zuckerberg can predict what you are going to do 
+    p->type=4;
+    random_stats(skill_count,p);
+    return 4;
+    break;
+  case 5://Abraham Lincoln
+    p->type=5;//Lincoln needs to be a tough enemy who you should probably just listen to instead of fighting
+    p->block=5;//If you skip lincolns speech you have to fight him, if you listen you get his hat
+    p->dodge=4;
+    p->sword=6;
+    p->power=3;
+    p->heal=1;
+    p->fire=4;
+    p->armor=5;
+    p->health=400;
+    p->maxhealth=400;
+    return 5;
+    break;
+  case 6://NEO
+    p->type=6;//Extremely hard to hit 
+    random_stats(skill_count,p);
+    p->dodge=15;
+    return 6;
+    break;
+  case 7://John Eldon
+    p->type=7;
+    random_stats(skill_count,p);
+    return 7;
+    break;
+  case 8://Gandalf the grey
+    p->type=8;
+    p->block=9;//Gandalf says "YOU SHALL NOT PASS!! when he blocks. He also has a high block skill.... gee I wonder why?
+    p->dodge=0;
+    p->sword=6;
+    p->power=5;
+    p->heal=1;
+    p->fire=5;
+    p->armor=0;
+    p->health=300;
+    p->maxhealth=300;
+    return 7;
+    break;
+  case 9://JFK 
+    p->type=9;//Randomize the stats but JFK dies if the fight goes on too long 
+    p->health=500;
+    p->maxhealth=500;
+    return 9;
+    break;
+  case 10://Glados
+    p->type=10; //She tries to throw you into a fire pit
+    p->block=0;
+    p->dodge=0;
+    p->sword=1;
+    p->power=10;
+    p->heal=0;
+    p->fire=10;
+    p->armor=10;
+    p->health=700;
+    p->maxhealth=700;
+    return 10;
+    break;
+  case 11://Gandalf the white!!
+    p->type=10;//Second to final special enemy!!
+    p->block=8;
+    p->dodge=7;
+    p->sword=10;
+    p->power=9;
+    p->heal=9;
+    p->fire=10;
+    p->armor=0;
+    p->health=800;
+    p->maxhealth=800;
     return 11;
+    break;
+  case 12://Final boss (the developers)
+    p->type=11;
+    p->block=12;
+    p->dodge=12;
+    p->sword=12;//Good luck killing this
+    p->power=12;
+    p->heal=12;
+    p->fire=12;
+    p->armor=12;
+    p->health=1000;
+    p->maxhealth=1000;
+    return 11;
+    break;
+  default:
+    return 13;
     break;
   }
   return 0;
@@ -612,50 +622,105 @@ insult_printer random_insult(void) {
     return insults[rand() % number_of_insults];
 }
 
-char* npc1_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc1_insults[] = {//Noob
+    "I dont know what I am doing!",
+    "DERP!",
+    "Whats going on? Am I supposed to hit buttons?"
 };
-char* npc2_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc2_insults[] = {//Donald Trump
+    "YOU ARE FAKE NEWS!!",
+    "CROOKED FIRE ATTACKS!",
+    "LITTLE BLOCKY!",
+    "I WILL BLOCK WITH MY BIG HUUUUGE BEAUTIFUL WALL",
+    "BELIEVE ME FOLKS, BELIEVE ME, AND I MEAN BELIEVE ME",
+    "YOU'RE FIRED!!",
+    "I AM A STABLE GENIUS!",
+    "I CAN BE MORE PRESIDENTIAL THAN ANYONE EXCEPT LINCOLN!",
+    "HE WENT AFTER MY HANDS NOBODY HAS EVER DONE THAT BEFORE!",
+    "I GAURANTEE YOU THAT THERE IS NO PROBLEM"
 };
-char* npc3_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc3_insults[] = {//Gabe Newell
+    "Hi I am Gabe Newell and I unfortunately have to stop you",
+    "You can reach me at gaben@valvesoftware.com",
+    "1....2....4....",
+    "I used to make games, now I make a lot of money by selling hats",
+    "Do you want to buy a hat? Okay how about a crate?",
+    "I led the development of the best games in history at one point!",
+    "I am worth billions of dollars!"
 };
-char* npc4_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc4_insults[] = {//Mark Zuckerberg
+    "No senator we do not use sketchy techniques!",
+    "BEEP BOOP ZUCKERBERG PERSONALITY ACTIVATED",
+    "Everything is fine at facebook! *Sips water awkwardly*",
+    "I already know what you are up to!",
+    "Using my platform makes you social! its in the name! I promise!"
 };
-char* npc5_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc5_insults[] = {//Abraham Lincoln, when Lincoln dies you should hear somebody say "Now he belongs to the ages"
+    "If I could win this fight without malice I would",
+    "With malice toward none and charity for all. With firmness in the right!",
+    "Prepare to be emancipated from life!!",
+    "My wife wants to go to the theatre I am sure it is to die for!",
+    "I am going to split you down the middle like I would a railroad spike!",
+    "I have my face on the side of a mountain!!",
+    "You can still surrender! I did not start this fight!",
+    "Listening to my oratory would be wise!",
+    "The fate of human dignity is in our hands!",
+    "Blood has been spilt' to allow us this moment! NOW! NOW!! NOW!!!",
+    "Fondly do we hope, fervently do we pray this mighty scourge of war may speedily pass away.",
+    "Until every drop of blood drawn with the lash shall be paid by another drawn with a sword..",
+    "Four score and seven years ago how the hell did I get here?",
+    "The world will little note what we say here because this is an ASCII game!",
+    "Government of the people by the people for the people shall not perish from this arena!"
 };
-char* npc6_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc6_insults[] = {//Neo
+    "What does that mean? MORPHEOUS??",
+    "Wait I need to say something for plot exposition!",
+    "TRINITY!! NOOOOO!!!!",
+    "I am the one! If you spell my name backwards it says one!"
 };
-char* npc7_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc7_insults[] = {//John Eldon
+    "I am going to LECTURE YOU!!",
+    "You cannot defeat MATLAB!",
+    "What is the difference between a stack and a heap? A stack is what you drive after you have a job"
 };
-char* npc8_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc8_insults[] = {//Gandalf the Grey
+    "YOU SHALL NOT PASS!!!!!",
+    "I am never late, nor am I early! I arrive precisely when I mean to!",
+    "Fool! Toss yourself aside and rid us of your stupidity!"
 };
-char* npc9_insults[] = {
-    "Insult 1",
-    "Insult 2",
-    "Insult 3"
+char* npc9_insults[] = {//JFK
+    "I will give you peace! The peace of the grave, or the security of the slave!",
+    "I was the last good U.S. President! What are you?",
+    "In the final analysis our most basic common link is we all inhabit this small arena",
+    "Its not an assassination, its an elimination!",
+    "I had sex with Marilyn Monroe, checkmate!",
+    "I catch bullets with my skull what do you do?",
+    "Ask not what skills can do for you! Ask what you can do for your skills!",
+    "My brother bobby is also pretty cool, im sure he wont have a tragic death!",
+    "I was once a PT boat commander but now im the PRESIDENT!!",
+    "We choose to whoop your ass! In this case because its very easy!"
+};
+char* npc10_insults[] = {//GLADOS
+     "CAKE WILL BE AWARDED IMMEDIETELY UPON FINISHING THE EXPERIMENT",
+     "WHAT ARE YOU DOING? YOU FAILED! THE TEST IS TERMINATED!",
+     "Remember when the platform was sliding into the fire pit and I was like 'goodbye'?"
+};
+char* npc11_insults[] = {//Gandalf the White
+     "I am Gandalf the white, I am Saruman as he should have been!",
+     "Look to my coming at first turn on the 5th attack! At dawn prepare to lose!",
+     "I am litterally an angel what the hell are you?",
+     "I already came back from the dead do you want to try this again?",
+     "Death is just another path, one that we all must take. INCLUDING YOU!",
+     "The gray-rain curtain of this world turns back to silver glass, you shall soon find out!"
+};
+char* npc12_insults[] = {//The developers 
+     "We are pleased you made it this far, but we dont think you can make it any longer through the game",
+     "We hope you enjoyed the game up to this point but unfortunately it will probably end here!",
+     "You cannot defeat the game developers! We ARE the arena!!",
+     "We have the edge! We know exactly how everything was made! The very UI you use was made by us!",
+     "You cannot defeat an enemy with perfect information!",
+     "Dont be a dickbag!",
+     "rip"
 };
 
 void npc_insult(int which_npc) {
@@ -702,7 +767,17 @@ void npc_insult(int which_npc) {
             insults_per_npc = 1;
             submit_log(npc9_insults[rand() % insults_per_npc], 0, 1);
             break;
-            
+        case 10:
+	    insults_per_npc = 1;
+	    submit_log(npc10_insults[rand() % insults_per_npc], 0, 1);
+	    break;
+        case 11:
+	    insults_per_npc=1;
+	    submit_log(npc11_insults[rand() % insults_per_npc], 0, 1);
+        case 12:
+	    insults_per_npc=1;
+	    submit_log(npc12_insults[rand() % insults_per_npc], 0, 1);
+	    break;
         default:
             break;
     }
